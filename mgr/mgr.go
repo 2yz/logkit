@@ -85,9 +85,16 @@ func NewCustomManager(conf ManagerConfig, pr *parser.ParserRegistry, sr *sender.
 func (m *Manager) Stop() error {
 	m.lock.Lock()
 	defer m.lock.Unlock()
+	var wg sync.WaitGroup
 	for _, runner := range m.runners {
-		runner.Stop()
+		wg.Add(1)
+		r := runner
+		go func() {
+			defer wg.Done()
+			r.Stop()
+		}()
 	}
+	wg.Wait()
 	m.watcherMux.RLock()
 	for _, w := range m.watchers {
 		if w != nil {

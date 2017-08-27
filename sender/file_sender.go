@@ -3,6 +3,7 @@ package sender
 import (
 	"encoding/json"
 	"os"
+	"time"
 
 	"github.com/qiniu/logkit/conf"
 	"github.com/qiniu/pandora-go-sdk/base/reqerr"
@@ -50,6 +51,8 @@ func newFileSender(name, path string, marshalFunc func([]Data) ([]byte, error)) 
 
 // Send inherit from Sender
 func (fs *FileSender) Send(datas []Data) error {
+	time.Sleep(10 * time.Millisecond)
+
 	bytes, err := fs.marshalFunc(datas)
 	if err != nil {
 		return reqerr.NewSendError(fs.Name()+" Cannot marshal data into file, error is "+err.Error(), ConvertDatasBack(datas), reqerr.TypeDefault)
